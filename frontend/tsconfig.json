@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    /* Avoid target deprecation by compiling to modern JS; SWC handles browser down-leveling */
+    "target": "es2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    /* 'bundler' or 'node' guarantees modern resolution of asset imports and side-effects */
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  /* Crucial: Includes ambient environment files so layout.tsx recognizes side-effect CSS modules */
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

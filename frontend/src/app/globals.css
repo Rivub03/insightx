@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f9fafb; /* Light neutral slate background for optimal financial dashboard readability */
+  color: #111827; /* Default dark gray body copy */
+}
