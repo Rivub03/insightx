@@ -220,6 +220,25 @@ __marimo__/
 # Dependencies
 node_modules/
 
-# Next.js build output and cache
+# Next.js Build Output
 .next/
 out/
+
+# Production Build Artifacts
+build/
+
+# Debug and System Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local Environment Variables
+.env*.local
+
+# Vercel Deployment Artifacts
+.vercel
+
+# TypeScript / IDE configurations
+.expo/
+.turbo/
