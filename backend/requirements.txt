@@ -1,0 +1,23 @@
+# Web framework + ASGI server
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# Pydantic v2 — validation and settings management (replaces Joi)
+pydantic>=2.4.0
+pydantic-settings>=2.0.0
+
+# Database (InsightX metadata store — SQLAlchemy async with asyncpg)
+sqlalchemy[asyncio]>=2.0.0
+asyncpg>=0.29.0
+
+# Encryption — AES-256-GCM (replaces Node's built-in crypto module)
+cryptography>=41.0.0
+
+# File uploads in FastAPI (replaces multer)
+python-multipart>=0.0.6
+aiofiles>=23.0.0
+
+# Target database drivers
+# asyncpg is reused above for target PostgreSQL connections
+pyodbc>=5.0.0           # MSSQL — requires Microsoft ODBC Driver 17/18 on the host OS
+oracledb>=2.0.0  # Oracle — Thin Mode works without Oracle Client libraries
