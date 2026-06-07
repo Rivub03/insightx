@@ -25,13 +25,28 @@ from app.core.config import settings
 # The async engine manages the connection pool to the InsightX metadata DB
 # pool_pre_ping=True: tests connections before use — handles stale connections
 #   gracefully after network interruptions or DB restarts
-engine = create_async_engine(
-    settings.database_url,
-    echo=False,           # Set True in development to log all SQL statements
-    pool_size=10,         # Persistent connections in the pool
-    max_overflow=20,      # Temporary connections allowed above pool_size under load
-    pool_pre_ping=True,
-)
+# For SQLite (development), we disable pooling since SQLite doesn't support concurrent writes
+is_sqlite = "sqlite" in settings.database_url.lower()
+engine_kwargs = {
+    "echo": False,           # Set True in development to log all SQL statements
+    "pool_pre_ping": True,
+}
+
+if is_sqlite:
+    # SQLite async setup
+    engine_kwargs.update({
+        "pool_size": 1,
+        "max_overflow": 0,
+        "connect_args": {"check_same_thread": False},
+    })
+else:
+    # PostgreSQL setup
+    engine_kwargs.update({
+        "pool_size": 10,         # Persistent connections in the pool
+        "max_overflow": 20,      # Temporary connections allowed above pool_size under load
+    })
+
+engine = create_async_engine(settings.database_url, **engine_kwargs)
 
 # Session factory — instantiated once, called many times
 AsyncSessionLocal = async_sessionmaker(

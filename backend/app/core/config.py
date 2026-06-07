@@ -22,9 +22,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # --- InsightX metadata DB ---
-    # Must use the +asyncpg dialect for SQLAlchemy async support:
-    #   postgresql+asyncpg://user:password@host:port/database_name
-    database_url: str
+    # For production: postgresql+asyncpg://user:password@host:port/database_name
+    # For development without PostgreSQL: sqlite+aiosqlite:///./insightx_dev.db
+    database_url: str = "sqlite+aiosqlite:///./insightx_dev.db"
 
     # --- AES-256-GCM credential encryption key ---
     # 64 hex characters = 32 bytes = 256 bits
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     # Directory for TLS certs, Oracle Wallets, and Kerberos keytabs
     # Must be outside the webroot and writable by the app process
     # In Docker, mount this as a persistent volume — NOT ephemeral container storage
-    secure_files_dir: str = "/var/insightx/secure-uploads"
+    secure_files_dir: str = "./secure-uploads"
 
     # Max file size for cert/wallet/keytab uploads (MB)
     max_upload_size_mb: int = 5

@@ -106,16 +106,16 @@ export function useDataSourceForm() {
       host: connection.host,
       port: connection.port,
       database: connection.database,
-      oracleConnectionType: connection.oracleConnectionType,
-      authMethod: auth.method,
+      oracle_connection_type: connection.oracleConnectionType,
+      auth_method: auth.method,
       credentials: auth.credentials,
       tls: {
         enabled: tls.enabled,
-        verifyServerCert: tls.verifyServerCert,
+        verify_server_cert: tls.verifyServerCert,
         mode: tls.mode,
-        caCertPath: tls.caCertPath, // populated after upload
-        clientCertPath: tls.clientCertPath,
-        clientKeyPath: tls.clientKeyPath,
+        ca_cert_path: tls.caCertPath, // populated after upload
+        client_cert_path: tls.clientCertPath,
+        client_key_path: tls.clientKeyPath,
       },
     }),
     [engine, connection, auth, tls],

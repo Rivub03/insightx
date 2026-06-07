@@ -10,7 +10,24 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from app.modules.datasources.router import router as datasources_router
+from app.db.session import engine
+from app.db.base import Base
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan context manager — runs code on app startup and shutdown.
+    Creates all database tables on startup (if they don't exist).
+    """
+    # Startup
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    # Shutdown
+    await engine.dispose()
 
 
 def create_app() -> FastAPI:
@@ -23,6 +40,7 @@ def create_app() -> FastAPI:
         title="InsightX API",
         version="1.0.0",
         description="InsightX Agentic Reporting Platform — M1: Data Source Onboarding",
+        lifespan=lifespan,
         # FastAPI auto-generates /docs (Swagger UI) and /redoc from route definitions
     )
 
@@ -30,7 +48,7 @@ def create_app() -> FastAPI:
     # Adjust allow_origins for staging/production deployments
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=["http://localhost:5173", "http://localhost:3000"],
         allow_credentials=True,  # Required for cookie-based sessions
         allow_methods=["*"],
         allow_headers=["*"],
