@@ -11,9 +11,9 @@
 #     (replaces Joi's .when() conditional schemas).
 #   - FastAPI auto-generates OpenAPI docs from these models (/docs endpoint).
 
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from enum import Enum
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ConfigDict
 from app.config.engines_config import ENGINES
 
 
@@ -40,6 +40,48 @@ class OracleConnectionType(str, Enum):
     sid          = "sid"
     service_name = "service_name"
 
+# ============================================================================
+# Credential Models
+# ============================================================================
+
+class PasswordCredentials(BaseModel):
+    username: str
+    password: str
+
+
+class LDAPCredentials(BaseModel):
+    username: str
+    password: str
+
+
+class WalletCredentials(BaseModel):
+    wallet_location: str
+
+
+class KerberosCredentials(BaseModel):
+    principal: str
+    keytab_path: str
+
+
+class AzureADCredentials(BaseModel):
+    access_token: str
+
+
+class WindowsCredentials(BaseModel):
+    domain: Optional[str] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
+
+
+CredentialType = Union[
+    PasswordCredentials,
+    LDAPCredentials,
+    WalletCredentials,
+    KerberosCredentials,
+    AzureADCredentials,
+    WindowsCredentials,
+]
+
 
 # ---------------------------------------------------------------------------
 # Sub-models
@@ -65,6 +107,16 @@ class TLSConfig(BaseModel):
     client_cert_path: Optional[str] = None
     client_key_path:  Optional[str] = None
 
+    @model_validator(mode="after")
+    def validate_tls(self):
+
+        if self.enabled and not self.mode:
+            raise ValueError(
+                "TLS mode is required when TLS is enabled"
+            )
+
+        return self
+
 
 # ---------------------------------------------------------------------------
 # Request models
@@ -75,11 +127,35 @@ class DatasourcePayload(BaseModel):
     Input model for both POST /datasources and POST /datasources/test.
     The test endpoint uses the same shape — it just does not persist anything.
 
-    Cross-field rules enforced by model_validator:
+    Cross-field rules enforced by model_validator (validation rules):
       1. oracle_connection_type is required when engine='oracle', forbidden otherwise
       2. auth_method must be valid for the selected engine
       3. credentials dict must contain the fields required by the auth_method
     """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "Finance Oracle",
+                "engine": "oracle",
+                "host": "oracle.company.com",
+                "port": 1521,
+                "database": "ORCL",
+                "oracle_connection_type": "service_name",
+                "auth_method": "password",
+                "credentials": {
+                    "username": "analytics_user",
+                    "password": "secret"
+                },
+                "tls": {
+                    "enabled": True,
+                    "mode": "ssl",
+                    "verify_server_cert": True
+                }
+            }
+        }
+    )
+
 
     name:     str = Field(min_length=1, max_length=100, description="Human-readable connection name")
     engine:   EngineType
